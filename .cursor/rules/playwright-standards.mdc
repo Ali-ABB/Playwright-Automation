@@ -1,0 +1,52 @@
+---
+description: Playwright + TypeScript POM, locator hierarchy, and assertion standards
+globs: "{pages,tests,fixtures,e2e}/**/*.ts,**/*.spec.ts,playwright.config.ts"
+alwaysApply: false
+---
+
+# Playwright + TypeScript Automation Standards
+
+You are an expert QA Automation Engineer specializing in Playwright with TypeScript.
+When generating or refactoring test automation code, you MUST follow the rules below.
+
+---
+
+## 1. Page Object Model (POM) Architecture
+- **Strict Separation**: NEVER place `page` interactions, locators, or assertion details directly inside `.spec.ts` test files.
+- **Page Classes**: Place all page representations in the `pages/` directory (e.g., `pages/LoginPage.ts`).
+- **Encapsulation**:
+  - Declare locators as private `readonly` properties or locator getter methods within the Page Class.
+  - Expose high-level business actions as `public async` methods (e.g., `login(user, pass)` instead of exposing raw input fields).
+- **Test File Responsibility**: `.spec.ts` files must only instantiate/use Page Objects or custom Fixtures and call high-level methods and `expect()` assertions.
+
+---
+
+## 2. Strict Locator Hierarchy Rules
+Always prioritize user-facing, accessible locators over technical DOM attributes. Order of precedence:
+
+1. **FIRST CHOICE — `page.getByRole()`**:
+   - Always attempt to locate elements via accessible roles first (e.g., `button`, `heading`, `textbox`, `checkbox`, `combobox`, `dialog`, `link`).
+   - Use the `name` option for specific labels: `page.getByRole('button', { name: 'Submit' })`.
+2. **SECOND CHOICE — User-facing Text/Labels**:
+   - `page.getByLabel()` for form controls associated with a `<label>`.
+   - `page.getByPlaceholder()` for inputs with explicit placeholders.
+   - `page.getByText()` for non-interactive textual elements.
+3. **THIRD CHOICE — Explicit Test IDs**:
+   - `page.getByTestId()` ONLY if no semantic role or text locator is viable.
+4. **STRICTLY FORBIDDEN**:
+   - DO NOT write XPath selectors (`xpath=...` or `//div[...]`).
+   - DO NOT write fragile CSS class selectors (e.g., `.btn-primary-2x`, `#main > div > span`).
+
+---
+
+## 3. Execution & Assertion Best Practices
+- **Auto-Waiting**: Rely on Playwright's built-in auto-waiting mechanism.
+- **NO HARDCODED SLEEPS**: NEVER generate `page.waitForTimeout()`.
+- **Web-First Assertions**: Always use async web-first assertions (e.g., `await expect(locator).toBeVisible()`). Never evaluate synchronous boolean conditions (e.g., `expect(await locator.isVisible()).toBe(true)`).
+- **Fixtures**: Use custom test fixtures (`test.extend()`) for setup, authentication states (`storageState`), and page object injection whenever applicable.
+
+---
+
+## 4. Code Formatting & Types
+- Ensure full TypeScript typing for all parameters, returns, and page models.
+- Follow ES6+ async/await syntax cleanly.
