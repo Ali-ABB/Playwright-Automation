@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+test-results.json
+
+# Nested duplicate project (has its own git history)
+Playwright-Test-Automation/
+
+# Secrets and local env
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+*.log

@@ -1,0 +1,18 @@
+---
+description: Workflows for publishing generated tests to PractiTest and updating Jira via MCP
+alwaysApply: false
+---
+
+# MCP Integration Rules for PractiTest & Jira
+
+When instructed to publish test cases or sync status:
+
+1. **PractiTest Sync**:
+   - Ensure every generated scenario contains a valid title, description, steps, and expected results before calling the PractiTest MCP tool.
+   - Capture the returned PractiTest Test ID (e.g., `PT-1042`).
+
+2. **Jira Ticket Updates**:
+   - Format comments cleanly in Jira markdown.
+   - When commenting on a Jira issue via MCP, always include:
+     - The list of newly created PractiTest Test IDs.
+     - A short summary of the test scenarios added to coverage.
