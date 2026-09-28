@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import { config } from './utils/env';
 
 /**
  * Read environment variables from file.
@@ -31,7 +32,8 @@ export default defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
     // baseURL: 'http://localhost:3000',
-    baseURL:'https://practicetestautomation.com/practice-test-login/',
+    baseURL:config.baseUrl,
+    headless:config.isCI ? true : true,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',

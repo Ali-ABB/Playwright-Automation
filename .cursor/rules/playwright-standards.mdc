@@ -1,9 +1,6 @@
 ---
-description: Playwright + TypeScript POM, locator hierarchy, and assertion standards
-globs: "{pages,tests,fixtures,e2e}/**/*.ts,**/*.spec.ts,playwright.config.ts"
-alwaysApply: false
+alwaysApply: true
 ---
-
 # Playwright + TypeScript Automation Standards
 
 You are an expert QA Automation Engineer specializing in Playwright with TypeScript.
