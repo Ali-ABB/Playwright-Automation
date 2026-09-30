@@ -1,0 +1,87 @@
+
+name: Playwright On-Demand Execution
+
+on:
+  # Keeps automated PR checks
+  pull_request:
+    branches: [ main, master ]
+
+  # Enables manual on-demand execution with UI inputs
+  workflow_dispatch:
+    inputs:
+      test_suite:
+        description: 'Select Test Suite / Tag to Run'
+        required: true
+        default: '@smoke'
+        type: choice
+        options:
+          - '@smoke'
+          - '@regression'
+          - '@smoke and @prod-safe'
+          - 'All Tests'
+      environment:
+        description: 'Target Environment'
+        required: true
+        default: 'qa'
+        type: choice
+        options:
+          - 'staging'
+          - 'prod'
+          - 'qa'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  pull-requests: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+
+      - run: npm ci
+
+      # Execute Playwright with dynamic tag filtering and environment variables
+      - name: Run Playwright Tests
+        run: |
+          # Build tag arguments
+          if [ "${{ github.event.inputs.test_suite }}" != "All Tests" ]; then
+            TAG_ARG="--grep '${{ github.event.inputs.test_suite }}'"
+          else
+            TAG_ARG=""
+          fi
+          echo "Executing Suite: \({{ github.event.inputs.test_suite }} on\){{ github.event.inputs.environment }}"
+          npx playwright test $TAG_ARG
+        env:
+          CI: true
+          ENV: ${{ inputs.environment || 'staging' }}
+          # Inject secrets securely based on target environment
+          TEST_USER_EMAIL: ${{ secrets.STAGING_USER_EMAIL }}
+          TEST_USER_PASSWORD: ${{ secrets.STAGING_USER_PASSWORD }}
+
+      - name: Upload Report Artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: playwright-report/
+
+  deploy-report:
+    if: ${{ !cancelled() }}
+    needs: test
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
