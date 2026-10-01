@@ -51,23 +51,26 @@ jobs:
 
       - run: npm ci
 
-      # Execute Playwright with dynamic tag filtering and environment variables
+      # .env.* stays gitignored. Pass values here instead of committing config/.env.qa.
       - name: Run Playwright Tests
-        run: |
-          # Build tag arguments
-          if [ "${{ github.event.inputs.test_suite }}" != "All Tests" ]; then
-            TAG_ARG="--grep '${{ github.event.inputs.test_suite }}'"
-          else
-            TAG_ARG=""
-          fi
-          echo "Executing Suite: \({{ github.event.inputs.test_suite }} on\){{ github.event.inputs.environment }}"
-          npx playwright test $TAG_ARG
         env:
           CI: true
-          ENV: ${{ inputs.environment || 'staging' }}
-          # Inject secrets securely based on target environment
-          TEST_USER_EMAIL: ${{ secrets.STAGING_USER_EMAIL }}
-          TEST_USER_PASSWORD: ${{ secrets.STAGING_USER_PASSWORD }}
+          ENV: ${{ github.event.inputs.environment || 'qa' }}
+          TEST_SUITE: ${{ github.event.inputs.test_suite }}
+          BASE_URL: https://practicetestautomation.com/practice-test-login/
+          TEST_USER: ${{ secrets.QA_USER_EMAIL }}
+          TEST_USER_PASSWORD: ${{ secrets.QA_USER_PASSWORD }}
+        run: |
+          if [ -z "$TEST_SUITE" ] || [ "$TEST_SUITE" = "All Tests" ]; then
+            echo "Executing all tests on ${ENV}"
+            npx playwright test
+          elif [ "$TEST_SUITE" = "@smoke and @prod-safe" ]; then
+            echo "Executing @smoke and @prod-safe on ${ENV}"
+            npx playwright test --grep "(?=.*@smoke)(?=.*@prod-safe)"
+          else
+            echo "Executing suite ${TEST_SUITE} on ${ENV}"
+            npx playwright test --grep "$TEST_SUITE"
+          fi
 
       - name: Upload Report Artifact
         if: ${{ !cancelled() }}
