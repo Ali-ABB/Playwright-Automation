@@ -64,10 +64,10 @@ jobs:
           npx playwright test $TAG_ARG
         env:
           CI: true
-          ENV: ${{ inputs.environment || 'staging' }}
+          ENV: ${{ inputs.environment || 'qa' }}
           # Inject secrets securely based on target environment
-          TEST_USER_EMAIL: ${{ secrets.STAGING_USER_EMAIL }}
-          TEST_USER_PASSWORD: ${{ secrets.STAGING_USER_PASSWORD }}
+          TEST_USER: ${{ secrets.QA_USER_EMAIL }}
+          TEST_USER_PASSWORD: ${{ secrets.QA_USER_PASSWORD }}
 
       - name: Upload Report Artifact
         if: ${{ !cancelled() }}
