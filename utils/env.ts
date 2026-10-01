@@ -14,15 +14,15 @@ export const config = {
   env: process.env.ENV || 'qa',
   baseUrl: process.env.BASE_URL || 'https://practicetestautomation.com/practice-test-login/',
   apiBaseUrl: process.env.API_BASE_URL || 'https://api-staging.example.com',
-  userEmail: process.env.TEST_USER_EMAIL || '',
+  username: process.env.TEST_USER || '',
   userPassword: process.env.TEST_USER_PASSWORD || '',
   isCI: !!process.env.CI,
 };
 
 // 4. Validate that critical variables exist before tests run
-const requiredEnvVars = ['BASE_URL', 'TEST_USER_EMAIL', 'TEST_USER_PASSWORD'];
+const requiredEnvVars = ['BASE_URL', 'TEST_USER', 'TEST_USER_PASSWORD'];
 for (const envVar of requiredEnvVars) {
   if (!process.env[envVar]) {
-    console.warn(`⚠️ Warning: Environment variable \({envVar} is missing in .env.\){ENV}`);
+    console.warn(`⚠️ Warning: Environment variable ${envVar} is missing in .env.${ENV}`);
   }
 }
