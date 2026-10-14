@@ -58,7 +58,7 @@ jobs:
           ENV: ${{ github.event.inputs.environment || 'qa' }}
           TEST_SUITE: ${{ github.event.inputs.test_suite }}
           BASE_URL: https://practicetestautomation.com/practice-test-login/
-          TEST_USER: ${{ secrets.QA_USER_EMAIL }}
+          TEST_USER: ${{ secrets.QA_USER }}
           TEST_USER_PASSWORD: ${{ secrets.QA_USER_PASSWORD }}
         run: |
           if [ -z "$TEST_SUITE" ] || [ "$TEST_SUITE" = "All Tests" ]; then
